@@ -42,5 +42,5 @@ Revisión técnica de la PR 1 y ajustes aplicados sobre ella. `entrega/` y los c
 - `propuesta/taller_anomalias.ipynb` es la versión ejecutada en ese entorno limpio.
 - No probado: la descarga real desde Drive y Python 3.11.
 
-## Pendiente (decisión de Piettro)
-Copiar `propuesta/taller_anomalias.ipynb` a `entrega/`, recalcular su SHA-256 en `docs/05_CIERRE.md` y actualizar los textos externos que citen el baseline 0,44 (el notebook propuesto calcula 0,375).
+## Estado: adoptado (27/10/2026)
+Piettro aceptó la propuesta. `propuesta/taller_anomalias.ipynb` se copió a `entrega/taller_anomalias.ipynb` (SHA-256 `248b5ffeaacbb7739e8ea227aeb0405d3e8240c92984f9f260c6c59907d7f051`), el hash se recalculó en `docs/05_CIERRE.md` (versión 2) y los textos externos que citaban el baseline 0,44 pasaron a 0,375. `entrega/scores.csv` no cambia. `propuesta/` queda como copia idéntica del notebook; si se retoca el notebook, regenerar `entrega/` y actualizar el cierre.
