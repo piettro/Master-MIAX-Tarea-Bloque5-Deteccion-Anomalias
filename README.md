@@ -15,7 +15,7 @@ cp .env.example .env            # ajustar rutas/semilla; sin secretos
 
 ## Datos
 Descargar de la carpeta de Drive del enunciado a `data/` (ignorada por git) y el notebook de partida a `notebooks/` (intacto).
-Si faltan los datos o `DEMO_MODE=true`, el pipeline corre con datos sintéticos (`samples/generar_sintetico.py`).
+Modo demo (`samples/generar_sintetico.py`): `scripts/generar_scores.py` cae a datos sintéticos si faltan los datos y escribe `entrega/scores_demo.csv`. El **notebook** se detiene con un error claro si faltan los CSV (admite `.zip` y `DESCARGAR_DATOS=true`) y solo usa datos sintéticos con `DEMO_MODE=true`.
 
 ## Estructura
 `src/anomalias/{config, detectors, domain, orchestration}` · `scripts/` · `tests/` · `samples/` · `docs/` · `entrega/`.

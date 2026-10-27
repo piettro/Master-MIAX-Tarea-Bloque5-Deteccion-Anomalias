@@ -45,6 +45,7 @@ anomalias/
 1. **Estructura** como arriba. Notebook de partida del Drive se conserva intacto en `notebooks/`.
 2. `domain/` y `orchestration/` dependen solo del Protocol `Detector` (en `detectors/base.py`). Ninguna librería de modelado (sklearn, lightgbm, torch…) se importa fuera de `detectors/`.
 3. **Modo demo**: si `DEMO_MODE=true` o faltan los datos reales, el pipeline corre completo con datos sintéticos. Los tests usan solo sintéticos.
+   - **Excepción (PR 1, aceptada por Piettro):** el **notebook** ya no cae a demo si faltan los datos: se detiene con un error claro y solo usa datos sintéticos con `DEMO_MODE=true` (admite también `.zip` y `DESCARGAR_DATOS=true`). `scripts/generar_scores.py` mantiene la caída a demo, pero escribe `scores_demo.csv`, nunca `scores.csv`.
 4. Toda salida de un detector se **valida con Pydantic/numpy checks**: longitud = nº filas, finita, sin NaN. Si falla, reintentar una vez (p. ej. con otra semilla) y degradar con mensaje claro.
 5. El orquestador ejecuta detectores **en paralelo** (joblib) y registra la traza por paso, mostrada en el notebook.
 6. **Degradación elegante**: si un detector opcional falla, el pipeline entrega igualmente el score del resto y avisa.
