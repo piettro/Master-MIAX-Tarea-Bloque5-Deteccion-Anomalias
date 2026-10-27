@@ -97,12 +97,16 @@ def evaluar_cv(
     cfg: ConfigExperimento,
     columnas: tuple[str, ...] = (),
     n_jobs: int = 2,
+    oof: dict[str, np.ndarray] | None = None,
 ) -> tuple[pd.DataFrame, Traza]:
     """Validación cruzada de detectores y de combinaciones (ensembles) sin fuga.
 
     Cada detector se ajusta una vez por partición; los ensembles reutilizan sus scores.
+    Si se pasa `oof`, se vacía y se rellena con los scores fuera de pliegue de la primera repetición.
     """
     verificar_features(columnas, cfg.columna_objetivo)
+    if oof is not None:
+        oof.clear()
     traza, filas = Traza(), []
     pesos = {e.nombre: e.peso for e in especs}
     for i, p in enumerate(particiones(y, cfg)):
@@ -116,6 +120,8 @@ def evaluar_cv(
             if presentes:
                 candidatos[nombre] = combinar(presentes, pesos)
         for nombre, s in candidatos.items():
+            if oof is not None and i < cfg.n_splits:
+                oof.setdefault(nombre, np.full(len(y), np.nan))[p.idx_val] = s
             filas.append({"modelo": nombre, "particion": i,
                           "aupr": aupr(y[p.idx_val], s), "p_at_k": precision_en_k(y[p.idx_val], s)})
     return pd.DataFrame(filas), traza
