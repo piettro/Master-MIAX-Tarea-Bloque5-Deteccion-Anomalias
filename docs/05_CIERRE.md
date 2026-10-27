@@ -10,6 +10,8 @@ Versión 2 (27/10/2026): el notebook de entrega se sustituye por la propuesta re
 
 `entrega/` contiene **solo** esos dos ficheros. Si se vuelve a generar cualquiera de ellos, hay que actualizar esta tabla.
 
+**Los hashes valen en cualquier sistema:** `.gitattributes` marca `entrega/*` como `-text`, de modo que git guarda y descarga los bytes exactos (sin convertir fines de línea). Antes de fijarlo, un clon en Linux o macOS producía ficheros con LF y hashes distintos (`6640073c…` y `38e1fed2…`) aunque el contenido era el mismo. Verificado con clones nuevos con y sin conversión automática (ver el commit que añade `.gitattributes`).
+
 Historial: el `scores.csv` **no ha cambiado** (el modelo es el mismo). El notebook de la versión 1 tenía SHA-256 `0b4232d0ebf8a27a28a7c20d24cb0f5c08bb6d1b6f5f05abf0dec50362c1befb`. `propuesta/taller_anomalias.ipynb` es una copia idéntica del actual.
 
 ## Verificación en entorno limpio (notebook v2)
