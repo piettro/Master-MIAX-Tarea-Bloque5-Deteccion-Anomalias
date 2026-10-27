@@ -5,3 +5,7 @@ __pycache__/
 .pytest_cache/
 .ipynb_checkpoints/
 *.pyc
+
+# Salida del notebook de la propuesta (el hash se documenta en docs/06_PROPUESTA_REVISION.md)
+propuesta/scores.csv
+propuesta/_*.ipynb

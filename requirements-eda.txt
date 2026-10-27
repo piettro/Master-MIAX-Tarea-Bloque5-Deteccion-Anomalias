@@ -1,4 +1,4 @@
 # Dependencias adicionales solo para el notebook de EDA (docs/EDA_datos.ipynb)
+# matplotlib ya está fijado en requirements.txt (lo usa también el notebook de entrega)
 -r requirements.txt
-matplotlib==3.10.8
 scipy==1.18.1

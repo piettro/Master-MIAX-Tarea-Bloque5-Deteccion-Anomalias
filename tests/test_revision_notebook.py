@@ -117,3 +117,67 @@ def test_descargar_zip_urlerror_lanza_runtimeerror(tmp_path, monkeypatch):
     with pytest.raises(RuntimeError, match="red"):
         ns["descargar_zip"]("http://x", destino)
     assert not destino.exists()
+
+
+# ---------------------------------------------------------------- comprobación de cifras (no fatal por defecto)
+def test_comparar_cifras_tolerancia_y_cota_superior():
+    import pandas as pd
+    from anomalias.domain.diagnostico import comparar_cifras
+
+    citadas = {"a": (0.834, 0.0005), "b": (0.5, 0.0005), "deriva_max": (0.02, 0)}
+    t = comparar_cifras(citadas, {"a": 0.8342, "b": 0.51, "deriva_max": 0.0159})
+    assert isinstance(t, pd.DataFrame) and t.set_index("cifra")["ok"].to_dict() == {"a": True, "b": False, "deriva_max": True}
+    assert not comparar_cifras({"deriva_max": (0.02, 0)}, {"deriva_max": 0.03})["ok"].iloc[0]
+
+
+def _espacio_comprobacion(estricta: bool, demo: bool = False) -> dict:
+    """Variables mínimas que la celda de comprobación espera, con valores que NO cuadran con lo citado."""
+    import pandas as pd
+
+    idx = ["hgb", "rf", "et", "ens_final (hgb+rf+et)", "hgb+rf", "ens_con_gmm", "gmm3"]
+    df = pd.DataFrame({"y": [0, 1, 0]})
+    return {
+        "pd": pd, "USAR_DEMO": demo, "SEED": 42, "CV_REPETICIONES": 1, "COMPROBACION_ESTRICTA": estricta,
+        "tabla_cv": pd.DataFrame({"AUPR": 0.5, "desv_entre_folds": 0.5}, index=idx),
+        "df_const_bruto": df, "df_prod": df, "df_const": df, "pos": 1, "OBJETIVO": "y", "dif": pd.Series([0.5]),
+        "BASE_GMM5": 0.1,
+        "evid_features": pd.DataFrame({"AUPR GMM(3)": 0.1, "AUPR HGB": 0.1}, index=["crudas", "transformadas"]),
+        "evid_reg": pd.DataFrame({"AUPR": [0.1, 0.2]}),
+        "SUBGRUPO": {"n_fuerte": 1, "n_suave": 1, "recall_fuerte": 0.1, "recall_suave": 0.1, "frac_suave_no_detectado": 0.1},
+    }
+
+
+def _celda_comprobacion() -> str:
+    return _constructor().c_comprobacion()
+
+
+def test_celda_comprobacion_avisa_y_continua_por_defecto(capsys):
+    from anomalias.domain.diagnostico import comparar_cifras
+
+    ns = _espacio_comprobacion(estricta=False)
+    ns["comparar_cifras"] = comparar_cifras
+    exec(_celda_comprobacion(), ns)  # no debe lanzar
+    salida = capsys.readouterr().out
+    assert "AVISO" in salida and "COMPROBACION_ESTRICTA=true" in salida
+
+
+def test_celda_comprobacion_estricta_detiene_el_notebook():
+    from anomalias.domain.diagnostico import comparar_cifras
+
+    ns = _espacio_comprobacion(estricta=True)
+    ns["comparar_cifras"] = comparar_cifras
+    with pytest.raises(AssertionError, match="no cuadran"):
+        exec(_celda_comprobacion(), ns)
+
+
+def test_celda_comprobacion_se_omite_en_demo(capsys):
+    ns = _espacio_comprobacion(estricta=True, demo=True)
+    exec(_celda_comprobacion(), ns)
+    assert "omitida en demo" in capsys.readouterr().out
+
+
+def test_notebook_define_la_variable_de_comprobacion_estricta():
+    nb = _constructor().construir(["Ana Pérez", "Luis García"])
+    codigo = "\n".join(c.source for c in nb.cells if c.cell_type == "code")
+    assert 'COMPROBACION_ESTRICTA = os.environ.get("COMPROBACION_ESTRICTA"' in codigo
+    assert "def comparar_cifras(" in codigo and "from anomalias" not in codigo

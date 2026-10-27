@@ -87,3 +87,10 @@ Informe completo y reproducible: `docs/04_VALIDACION_FASE6.md` (`scripts/validar
 - **Código añadido** (no usado por el pipeline entregado): `domain/diagnostico.py`, `detectors/aumentado.py` (variables derivadas calculadas solo con filas de ajuste) y `tests/test_fase6.py`.
 
 **Decisión del usuario (tras la Fase 6):** el proyecto se queda **como está**, sin la frecuencia del importe (H4). `entrega/scores.csv` y `entrega/taller_anomalias.ipynb` no cambian. Motivo: la ganancia (+0,004 en el ensemble) es ≈ 10 veces menor que el ruido entre pliegues y no alcanzó el criterio de confirmación.
+
+## Revisión de la PR 1 (Raúl): notebook revisado en `propuesta/`
+Revisión técnica y ajustes en la rama `revision/ajustes-pr1`. **Piettro aceptó la propuesta en principio**; `entrega/` y los checksums de `docs/05_CIERRE.md` **no se han tocado** hasta que se decida copiar el notebook.
+- **Verificado en la PR**: 49 tests; ejecución completa con datos reales sin errores; `scores.csv` con el mismo SHA-256 que `entrega/scores.csv` (el modelo no cambia); la descarga de Drive es opt-in, valida el zip y no extrae contenido.
+- **Excepción a la regla 3 de la spec** (decisión de Piettro al aceptar): el notebook no cae en silencio a datos sintéticos; antes podía escribir un `scores.csv` de 2 000 filas si faltaban los datos.
+- **Ajustes aplicados tras la revisión**: (1) conflicto de `matplotlib` entre `requirements.txt` (3.11.2) y `requirements-eda.txt` (3.10.8): se elimina la línea duplicada; (2) la comprobación de cifras **avisa y continúa** por defecto (tolerancia ±0,0005 frágil ante otras versiones de librerías; varias cifras estaban cerca del límite) y solo detiene el notebook con `COMPROBACION_ESTRICTA=true`; la comparación pasa a `comparar_cifras` en `domain/diagnostico.py`, con tests; (3) `propuesta/scores.csv` (2,3 MB duplicado) deja de versionarse; su hash queda documentado.
+- **Efecto si se adopta el notebook**: el baseline citado pasa de 0,436 (5×2, no calculado en el notebook) a **0,375** (calculado en el propio notebook, 5×1). Hay que actualizar los textos externos que citen 0,44 (por ejemplo `portfolio/`).

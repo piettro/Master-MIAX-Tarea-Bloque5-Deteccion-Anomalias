@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import numpy as np
+import pandas as pd
 
 from anomalias.detectors.base import Detector
 from anomalias.domain.validation import aupr
@@ -49,3 +50,17 @@ def fraccion_con_copia(X_ajuste: np.ndarray, X_val: np.ndarray) -> float:
     """Fracción de filas de validación con una copia exacta en las filas de ajuste."""
     vistas = {fila.tobytes() for fila in np.ascontiguousarray(X_ajuste)}
     return float(np.mean([fila.tobytes() in vistas for fila in np.ascontiguousarray(X_val)]))
+
+
+def comparar_cifras(
+    citadas: dict[str, tuple[float, float]],
+    calculado: dict[str, float],
+    cotas_superiores: tuple[str, ...] = ("deriva_max",),
+) -> pd.DataFrame:
+    """Contrasta cada cifra citada (valor, tolerancia) con la calculada; las `cotas_superiores` solo exigen calculado < citado."""
+    filas = []
+    for clave, (citado, tol) in citadas.items():
+        calc = float(calculado[clave])
+        ok = calc < citado if clave in cotas_superiores else abs(calc - citado) <= tol
+        filas.append({"cifra": clave, "citado": citado, "calculado": round(calc, 5), "tolerancia": tol, "ok": bool(ok)})
+    return pd.DataFrame(filas, columns=["cifra", "citado", "calculado", "tolerancia", "ok"])
